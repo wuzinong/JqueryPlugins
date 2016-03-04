@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>cityDetail</title>
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+   <style type="text/css">
+      table th{cursor:pointer;}
+  </style>
+</head>
+<body>
+    <div id="cotton-search-result" class="panel-body">
+        <table class="table table-cotton-list infoSort">
+            <thead>
+                <tr class="">
+                    <th>发布日期</th>
+                    <th>交易时间</th>
+                    <th>交易金额</th>
+                    <th>基金名称</th>
+                    <th>重量</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="">
+                    <td>2015-12-27</td>
+                    <td>
+                        2015-12-27
+                    </td>
+                    <td>
+                        12000
+                    </td>
+                    <td>
+                        某某基金1
+                    </td>
+                    <td>
+                        20.00
+                    </td>
+                    <td>
+                        <a class="mr10 lnk-show-quotations" data-title="RFQ 5 的报价" href="javascript:;" data-url="/myoffice/cottonrfqs/listquotations?rfqid=5">
+                            查看报价
+                        </a>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td>2012-12-13</td>
+                    <td>
+                        2015-12-31
+                    </td>
+                    <td>
+                        1400000
+                    </td>
+                    <td>
+                        某某基金2
+                    </td>
+                    <td>
+                        100.00
+                    </td>
+                    <td>
+                        <a class="mr10 lnk-show-quotations" data-title="RFQ 4 的报价" href="javascript:;" data-url="/myoffice/cottonrfqs/listquotations?rfqid=4">
+                            查看报价
+                        </a>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td>2015-12-12</td>
+                    <td>
+                        2015/12/29
+                    </td>
+                    <td>
+                       12001
+                    </td>
+                    <td>
+                        某某基金3
+                    </td>
+                    <td>
+                        23.00
+                    </td>
+                    <td>
+                        <a class="mr10 lnk-show-quotations" data-title="RFQ 3 的报价" href="javascript:;" data-url="/myoffice/cottonrfqs/listquotations?rfqid=3">
+                            查看报价
+                        </a>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td>2015-12-13</td>
+                    <td>
+                        2015/12/31
+                    </td>
+                    <td>
+                        133333
+                    </td>
+                    <td>
+                        某某基金1
+                    </td>
+                    <td>
+                        18.90
+                    </td>
+                    <td>
+                        <a class="mr10 lnk-show-quotations" data-title="RFQ 2 的报价" href="javascript:;" data-url="/myoffice/cottonrfqs/listquotations?rfqid=2">
+                            查看报价
+                        </a>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td>2015-12-13</td>
+                    <td>
+                        2015-12-31
+                    </td>
+                    <td>
+                        144323
+                    </td>
+                    <td>
+                        某某基金1
+                    </td>
+                    <td>
+                        45.60
+                    </td>
+                    <td>
+                        <a class="mr10 lnk-show-quotations" data-title="RFQ 1 的报价" href="javascript:;" data-url="/myoffice/cottonrfqs/listquotations?rfqid=1">
+                            查看报价
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div class="paginate">
+            <div class="pagination-container"><ul class="pagination"><li class="active"><a>1</a></li></ul></div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var q7 = !function ($) {
+            var flag = true;
+            var timeReg = /^(\d{4})(-|\/)(\d{2})(-|\/)(\d{2})$/;
+            //兼容ie
+            if (!String.prototype.trim) {
+                String.prototype.trim = function () {
+                    return this.replace(/^\s |\s $/g, '');
+                }
+            }
+            $.fn.infoSort = function () {
+                var that = $(this);
+                var sortList = that.find("tbody tr");
+                that.find("thead th").each(function (sortIndex) {
+                    $(this).on("click", function () {
+                        var dealed = dealSort(sortList, sortIndex);
+                        sortList.remove();
+                        that.find("tbody").append(dealed);
+                    });
+                });
+                function dealSort(sortList, sortIndex) {
+                    if (flag) {
+                        sortList.sort(function (a, b) {
+                            var result = handleCommon(a, b, sortIndex);
+                            return result;
+                        });
+                    } else {
+                        sortList.sort(function (a, b) {
+                            var result = handleCommon(a, b, sortIndex);
+                            return (-result);
+                        });
+                    }
+                    flag = !flag;
+                    return sortList;
+                }
+                function handleCommon(a, b, sortIndex) {
+                    var compare_1 = $(a).find("td").eq(sortIndex).text().trim(),
+                            compare_2 = $(b).find("td").eq(sortIndex).text().trim();
+                    var result = 0;
+                    if (!isNaN(compare_1)) {
+                        result = parseFloat(compare_1) - parseFloat(compare_2);
+                    } else if (timeReg.test(compare_1)) {
+                        result = Date.parse(compare_1) - Date.parse(compare_2);
+                    } else {
+                        result = compare_1.localeCompare(compare_2);
+                    }
+                    return result
+                }
+            }
+            $(".infoSort").infoSort();
+        }(window.jQuery);
+    </script>
+</body>
+</html>
