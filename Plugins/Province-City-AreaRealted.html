@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>cityDetail</title>
+      <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="row">
+        <div class="col-sm-4">
+            <select class="form-control area province">
+                <option value="">请选择--</option>
+            </select>
+
+        </div>
+        <div class="col-sm-4 ">
+            <select class="form-control area city">
+                <option value="">请选择--</option>
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <select class="form-control area county">
+                <option value="">请选择--</option>
+            </select>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var p7 = (function () {
+            var data = '[{"ID":1,"name":"上海","parentID":0,"level":0},{"ID":2,"name":"北京","parentID":0,"level":0},{"ID":3,"name":"上海","parentID":1,"level":1},{"ID":4,"name":"宝山","parentID":3,"level":2},{"ID":5,"name":"崇明","parentID":3,"level":2},{"ID":6,"name":"嘉定","parentID":3,"level":2},{"ID":7,"name":"北京","parentID":2,"level":1},{"ID":8,"name":"朝阳区","parentID":7,"level":2},{"ID":9,"name":"测试区","parentID":7,"level":2},{"ID":10,"name":"山西","parentID":0,"level":0},{"ID":11,"name":"太原","parentID":10,"level":1},{"ID":12,"name":"太原小镇","parentID":11,"level":2},{"ID":13,"name":"山西2","parentID":10,"level":1},{"ID":14,"name":"山西33如","parentID":10,"level":1},{"ID":15,"name":"山","parentID":14,"level":2}]',
+                province = [],
+                city = [],
+                county = [];
+            //服务器请求数据
+            //$.post("/Home/getCityPureFront", {}, function (result) {
+            //    data = result;
+            //    console.log(JSON.stringify(result));
+            //    for (var i = 0; i < result.length; i++) {
+            //        var rs = result[i];
+            //        if (rs.level === 0) { province.push(rs); }
+            //        if (rs.level === 1) { city.push(rs); }
+            //        if (rs.level === 2) { county.push(rs);}
+            //    }
+            //});
+            var result = JSON.parse(data);
+                for (var i = 0; i < result.length; i++) {
+                    var rs = result[i];
+                    if (rs.level === 0) { province.push(rs); }
+                    if (rs.level === 1) { city.push(rs); }
+                    if (rs.level === 2) { county.push(rs);}
+                }
+
+            $.fn.cityProvince = function () {
+                var that = $(this);
+                init(province, that.filter(".province"));
+                that.each(function () {
+                    if ($(this).hasClass("province")) {
+                        $(this).on("change", function () {
+                           var cityStr = "";
+                           for (var i = 0; i < city.length; i++) {
+                               if (city[i].parentID == $(this).val()) {
+                                   cityStr += "<option value='" + city[i].ID + "'>" + city[i].name + "</option>"
+                               }
+                           }
+                           that.filter(".city").find("option:gt(0)").remove();
+                           that.filter(".city").find("option").after(cityStr).trigger("change");
+                        });
+
+                    }else if ($(this).hasClass("city")) {
+                        $(this).on("change", function () {
+                            var cityStr = "";
+                            for (var i = 0; i < county.length; i++) {
+                                if (county[i].parentID == $(this).val()) {
+                                    cityStr += "<option value='" + county[i].ID + "'>" + county[i].name + "</option>"
+                                }
+                            }
+                            that.filter(".county").find("option:gt(0)").remove();
+                            that.filter(".county").find("option").after(cityStr);
+                            
+                        });
+
+                    }
+
+                });
+            }
+            
+            function init(data,container) {
+                var str;
+                for (var i = 0; i < province.length; i++) {
+                    str += '<option value="' + data[i].ID + '">' + data[i].name + '</option>';
+                    console.log(str);
+                }
+                container.append(str);
+            }
+
+            $(".area").cityProvince();
+        })(window.$);
+
+    </script>
+</body>
+</html>
