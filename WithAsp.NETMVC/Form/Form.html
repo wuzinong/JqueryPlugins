@@ -131,7 +131,7 @@
                     <div class="input">
                         <input type="password" id="password" name="password" class="text">
 
-                        <label id="pwd_ms" gclass="hide"></label>
+                        <label id="pwd_msg" gclass="hide"></label>
                     </div>
                 </div>
                 <div class="item">
@@ -288,7 +288,7 @@ function emailValidator(){
     email_msg.text("Email不能为空");
     email_msg.attr("class","error");
     return false;
-  }else if(!/^\w+([-+.]\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value)){
+  }else if(!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value)){
     email_msg.text("Email格式不正确");
     email_msg.attr("class","error");
     return false;
