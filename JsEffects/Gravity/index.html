@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+ 
+</head>
+<body>
+<img src="chacha.png" id="imgLogo" alt="">
+	
+<p id="moCalcTiltLR"></p> 
+<p id="moCalcTiltFB"></p> 
+<p id="pos"></p> 
+
+<script> 
+function deviceMotionHandler(eventData) { 
+  var ele = document.getElementsByTagName('img')[0];
+  var acceleration = eventData.accelerationIncludingGravity; 
+  var facingUp = -1; 
+  if (acceleration.z > 0) { 
+    facingUp = +1; 
+  }      
+  var tiltLR = Math.round(((acceleration.x) / 9.81) * -90); 
+  var tiltFB = Math.round(((acceleration.y + 9.81) / 9.81) * 90 * facingUp);
+ 
+   document.getElementById("pos").innerHTML = ele.style.left; 
+  document.getElementById("moCalcTiltLR").innerHTML = tiltLR; 
+  document.getElementById("moCalcTiltFB").innerHTML = tiltFB; 
+  var rotation = "rotate(" + tiltLR + "deg) rotate3d(1,0,0, " + (tiltFB) + "deg)"; 
+  document.getElementById("imgLogo").style.webkitTransform = rotation;        
+  document.getElementById("imgLogo").style.Transform = rotation;
+} 
+// 
+if (window.DeviceMotionEvent) { 
+window.addEventListener('devicemotion',deviceMotionHandler, false); 
+}else{ 
+    alert('亲，你的浏览器不支持DeviceMotionEvent哦~'); 
+} 
+</script>
+</body>
+</html>
