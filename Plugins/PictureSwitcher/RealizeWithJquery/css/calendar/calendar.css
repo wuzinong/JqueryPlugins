@@ -1,0 +1,16 @@
+.calendarContainer {
+  width: 9.6rem;
+  height: 10rem;
+  margin: 20px auto;
+  border: 1px solid red; }
+  .calendarContainer .cHeader {
+    text-align: center;
+    margin: 0.42693rem 0;
+    font-size: 0.52545rem; }
+    .calendarContainer .cHeader a {
+      text-decoration: none; }
+  .calendarContainer .cBox {
+    width: 1.41215rem;
+    height: 0.9688rem; }
+
+/*# sourceMappingURL=calendar.css.map */

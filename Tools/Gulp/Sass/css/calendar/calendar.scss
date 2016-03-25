@@ -1,0 +1,23 @@
+$borderstyle:1px solid red;
+$width:609;
+$times:10;
+
+.calendarContainer{
+  width:9.6rem;
+  height: (609/$width)*$times+rem;
+  margin:20px auto;
+  border:$borderstyle;
+
+  .cHeader{
+	text-align: center;
+    margin:(26/$width)*$times+rem 0;
+    font-size: (32/$width)*$times+rem;
+
+    a{text-decoration: none;}
+  }
+
+   .cBox{
+   	    width:(86/$width)*$times +rem;
+   	    height:(59/$width)*$times +rem;
+   }
+}

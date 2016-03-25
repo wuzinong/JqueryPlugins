@@ -1,0 +1,27 @@
+/*variables begin*/
+/*variables end*/
+/*Media query begin*/
+/*Media query end*/
+/*Common style begin*/
+/*Common style end*/
+/*Function begin*/
+/*Function End*/
+body .myclass {
+  width: 100px;
+  height: 20px;
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3), inset 0 0 3px rgba(255, 255, 255, 0.5);
+  -o-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3), inset 0 0 3px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3), inset 0 0 3px rgba(255, 255, 255, 0.5);
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transform: scale(2);
+  -moz-transform: scale(2);
+  -o-transform: scale(2);
+  transform: scale(2);
+  font-size: 1.25em; }
+  @media screen and (min-width: 780px) and (max-width: 1000px) {
+    body .myclass {
+      background-color: red; } }
+
+/*# sourceMappingURL=test.css.map */

@@ -1,0 +1,116 @@
+/*variables begin*/
+
+  //judege whether fit for the prefix of browers if not ,change true into false
+  //----------------------------
+  $prefix-for-webkit: true !default;
+  $prefix-for-mozilla: true !default;
+  $prefix-for-microsoft: true !default;
+  $prefix-for-opera: true !default;
+  $prefix-for-spec: true !default; // 
+
+/*variables end*/
+ 
+
+@mixin marginStyle($value) {
+   margin-top: $value;
+}
+
+@mixin markBorder(){
+	border:1px solid red;
+}
+
+/*Media query begin*/
+@mixin screen($res-min,$res-max){
+    @media screen and ( min-width:$res-min ) and ( max-width:$res-max){
+          @content;
+    }
+
+}
+/*Media query end*/
+
+
+/*Common style begin*/
+// triangle
+@mixin triangle($direction, $size, $borderColor ) {
+  content:"";
+  height: 0;
+  width: 0;
+
+  @if $direction == top {
+    border-bottom:$size solid $borderColor;
+    border-left:$size dashed transparent;
+    border-right:$size dashed transparent;
+  }
+  @else if $direction == right {
+    border-left:$size solid $borderColor;
+    border-top:$size dashed transparent;
+    border-bottom:$size dashed transparent;
+  }
+  @else if $direction == bottom {
+    border-top:$size solid $borderColor;
+    border-left:$size dashed transparent;
+    border-right:$size dashed transparent;
+  }
+  @else if $direction == left {
+    border-right:$size solid $borderColor;
+    border-top:$size dashed transparent;
+    border-bottom:$size dashed transparent;
+  }
+}
+
+
+
+
+
+// prefixer
+//----------------------------
+@mixin prefixer ($property, $value, $prefixes) {
+  @each $prefix in $prefixes {
+
+    @if $prefix == webkit and $prefix-for-webkit == true {
+      -webkit-#{$property}: $value;
+    }
+    @else if $prefix == moz and $prefix-for-mozilla == true {
+      -moz-#{$property}: $value;
+    }
+    @else if $prefix == ms and $prefix-for-microsoft == true {
+      -ms-#{$property}: $value;
+    }
+    @else if $prefix == o and $prefix-for-opera == true {
+      -o-#{$property}: $value;
+    }
+    @else if $prefix == spec and $prefix-for-spec == true {
+      #{$property}: $value;
+    }
+    @else {
+      @warn "Unrecognized prefix: #{$prefix}";
+    }
+  }
+}
+
+//fit for webkit opera and standard
+@mixin box-shadow($shadow...) {
+    @include prefixer(box-shadow, $shadow,webkit o spec);
+}
+
+//fit for webkit , standard and mozilla
+@mixin box-sizing($type:border-box){
+    @include prefixer(box-sizing,$type,webkit moz spec)
+}
+ 
+//fit for webkit moz o and standard
+@mixin transform($property){
+	@include prefixer(transform,$property,webkit moz o spec);
+}
+
+
+/*Common style end*/
+
+
+/*Function begin*/
+
+// px -> em
+@function pxToEm($px, $base: 16) {
+  @return ($px / $base) * 1em;
+}
+/*Function End*/

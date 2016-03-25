@@ -1,0 +1,45 @@
+/*variables begin*/
+/*variables end*/
+/*Media query begin*/
+/*Media query end*/
+/*Common style begin*/
+/*Common style end*/
+/*Function begin*/
+/*Function End*/
+.testBall, .test {
+  height: 100px;
+  width: 100px;
+  border: 2px solid olive;
+  border-radius: 50px;
+  position: fixed;
+  top: 200px;
+  -webkit-animation-name: run;
+          animation-name: run;
+  -webkit-animation-duration: 2s;
+          animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-timing-function: ease;
+          animation-timing-function: ease;
+  animation-fill-model: both;
+  -webkit-animation-direction: alternate;
+          animation-direction: alternate; }
+
+.test {
+  color: red; }
+
+@-webkit-keyframes run {
+  from {
+    -webkit-transform: translate(0, 0);
+            transform: translate(0, 0); }
+  to {
+    -webkit-transform: translate(0, -30px);
+            transform: translate(0, -30px); } }
+
+@keyframes run {
+  from {
+    -webkit-transform: translate(0, 0);
+            transform: translate(0, 0); }
+  to {
+    -webkit-transform: translate(0, -30px);
+            transform: translate(0, -30px); } }

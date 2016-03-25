@@ -1,0 +1,27 @@
+@import "mixin.scss";
+
+.testBall{
+	height: 100px;
+	width:100px;
+	border:2px solid olive;
+	border-radius: 50px;
+	position:fixed;
+	top:200px;
+	animation-name:run;
+	animation-duration:2s;
+	animation-iteration-count:infinite;
+	animation-timing-function:ease;
+	animation-fill-model:both;
+	animation-direction:alternate;
+}
+
+.test{
+	@extend .testBall;
+	color:red;
+}
+
+
+@keyframes run{
+	from{transform:translate(0,0);}
+	to{transform:translate(0,-30px);} 
+}
