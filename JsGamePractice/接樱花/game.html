@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Game</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <style type="text/css">
+    html,body{
+      width:100%;
+      height: 100%;
+    }
+    *{
+      margin:0;
+      padding:0;
+    }
+    .container{
+      width:99%;
+      height: 99%;
+      margin:0 auto;
+      border:1px solid red;
+      position:relative;
+      overflow: hidden;
+    }
+    .scoreBar{
+        width:100%;
+        height: 50px;
+        background-color:rgba(238,241,20,0.5);
+        font-size: 28px;
+    }
+    .people{
+       width:40px;
+       height: 50px;
+       background-color: olive;
+       position: absolute;
+       bottom:0;
+       left:45%;
+       z-index: 10;
+    }
+</style>
+</head>
+<body>
+   <div class="container">
+       <div class="scoreBar">
+           <p class="scoreInner">score:<span id="sResult">0</span></p>
+           
+
+           <div id="people" class="people"></div>
+       </div>
+   </div>
+
+   <script type="text/javascript">
+        window.onload=function(){
+            var commonAttr={
+                   personX:0,
+                   personY:0,
+                   moveX:0,
+                   moveY:0,
+                   distance:0,
+                   sizeRate:10,
+                   peopleHeight:50,
+                   peopleWidth:40,
+                   screenWidth: document.documentElement.clientWidth,
+                   screenHeight:(document.documentElement.clientHeight-20),
+                   score:document.querySelector('#sResult'),
+                   elem:document.querySelector('.container'),
+                   commonClassName:"blocks",
+                   Interval:"",
+                   peo:document.querySelector("#people"),
+                   block:{
+                      bSt:[{color:"red",score:"-20",bs:"solid",br:"15px"},{color:"olive",score:"20",bs:"dashed",br:"0"},{color:"black",score:"-15",bs:"solid",br:"3px"},{color:"blue",score:"-30",bs:"dotted",br:"2px"}]
+                   }
+                };
+
+          function Game(){}
+           Game.prototype.Start = function(){
+              people.init();
+              commonAttr.Interval =setInterval(function(){
+                  blockFactory.create();
+              },1000);
+
+           }
+           Game.prototype.End = function(){
+               clearInterval(commonAttr.Interval);
+                alert("游戏结束,您的d得分："+commonAttr.score.innerText);
+                location.reload();
+           }
+
+
+
+            var people = {
+                init:function(){
+                   var person = commonAttr.peo;
+                   person.addEventListener('touchmove',function(event){
+                        if(event.targetTouches.length > 1 || event.scale && event.scale !== 1) return;
+                        var touch = event.targetTouches[0];
+                        commonAttr.moveX = touch.clientX;
+                        commonAttr.moveY = touch.clientY;
+                        // console.log(touch.clientX);
+                        people.move();
+                   },false);
+
+                },
+                move:function(){
+                    //移动及边界处理
+                    if((commonAttr.moveX+commonAttr.peopleWidth)>commonAttr.screenWidth){
+                      commonAttr.peo.style.left=(commonAttr.screenWidth-commonAttr.peopleWidth)+"px";
+                    }else if((commonAttr.moveX+commonAttr.peopleWidth)<0){
+                      commonAttr.peo.style.left=0+"px";
+                    }else{
+                      commonAttr.peo.style.left=commonAttr.moveX+"px";
+                    }
+                }
+            }
+           function block(){
+               this.init();
+           }
+           block.prototype.init=function(){
+              var a = this.createEle();
+               commonAttr.elem.appendChild(a);
+              var that = this;
+               var b = setInterval(function(){
+                  var top = parseInt(a.style.top);
+                  if(top>=commonAttr.screenHeight)
+                  {
+                     commonAttr.elem.removeChild(a);
+                     clearInterval(b);
+                  }else{
+                    a.style.top=parseInt(a.style.top)+10+"px";
+
+                    if((parseInt(a.style.top))>=(commonAttr.screenHeight-commonAttr.peopleHeight))
+                      {
+                        if(that.checkHit(a)){
+                          var realScore =parseInt(commonAttr.score.innerText)+parseInt(a.getAttribute("score"));
+                          if(realScore>=0)
+                          {
+                            commonAttr.score.innerText= realScore;
+                            commonAttr.elem.removeChild(a);
+                            clearInterval(b);
+                          }else{
+                              commonAttr.score.innerText= 0;
+                              console.log(a.style.top);
+                              g.End();
+                          }
+                          
+                      }
+
+                    }
+                  }
+               },100);
+               return a;
+           }
+           block.prototype.createEle=function(){
+               var a  = document.createElement("div");
+               a.className = commonAttr.commonClassName;
+
+               var r =parseInt(Math.random()*(commonAttr.block.bSt.length));
+               var aStyle = commonAttr.block.bSt[r];
+
+
+               var width = parseInt(Math.random()*commonAttr.sizeRate)+1;
+               var height = parseInt(Math.random()*commonAttr.sizeRate)+1;
+               a.style.border="1px "+aStyle.bs+" "+aStyle.color;
+               a.style.width= width+'px';
+               a.style.height=height+'px';
+               a.style.position = "absolute";
+               a.style.top ="-"+height-2+"px";
+               a.style.left=parseInt(Math.random()*commonAttr.screenWidth)+"px";
+               a.style["border-radius"]= aStyle.br;
+               a.setAttribute("score",aStyle.score);
+               return a;
+           }
+           block.prototype.checkHit=function(ele){
+                var blockLeft = parseInt(ele.style.left);
+                if(blockLeft>=commonAttr.moveX && blockLeft<=(commonAttr.moveX+commonAttr.peopleWidth)){
+                   return true;
+                }else{
+                   return false;
+                }
+           }
+
+           var blockFactory={
+               create:function(){
+                  new block();
+               }
+           }
+
+           
+ 
+           var g = new Game();
+           g.Start();
+
+        }
+   </script>
+</body>
+</html>
