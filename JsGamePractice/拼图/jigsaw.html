@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="telephone=no,email=no" name="format-detection">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+    <title>game2 jigsaw</title>
+     <style type="text/css">
+        html,body{
+          width:100%;
+        }
+        *{
+          padding:0;
+          margin:0;
+        }
+       .container{
+               width:98%;
+               margin:0 auto;
+            }
+
+       #canvas{
+          border:1px solid olive;
+          overflow: hidden;
+       }
+       .stage,.mobileStage{
+          border:1px solid purple;
+          overflow: hidden;
+       }
+       .stage img,.mobileStage img{
+          float: left;
+       }
+       p{
+          font-size:0.25rem;
+       }
+
+     </style>
+     <script async>
+            var calculate_size = function() {
+                var docEl = document.documentElement,
+                    clientWidth = document.querySelector(".container").clientWidth;
+                if (!clientWidth) return;
+                docEl.style.fontSize = (clientWidth / 10) + 'px';
+            };
+            if (document.addEventListener) {
+                var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
+                window.addEventListener(resizeEvt, calculate_size, false);
+                document.addEventListener('DOMContentLoaded', calculate_size, false);
+                calculate_size();
+            }
+    </script>
+</head>
+<body>
+      <div class="container">
+          <br/><br/>
+          <input id="fileBtn" type="file" accept="image/png,image/gif,image/jpeg" value="选择上传图片"/>
+           <br/>
+
+          <p style="color:green">移动端</p>
+          <p>指定大小的图片</p>
+          <img id="mobilePic" src="">
+          <p>指定大小图片临时画布</p>
+          <canvas id="mobileCanvas"></canvas>
+          <p>移动端舞台</p>
+          <p>
+            <button id="confuseMobile">打乱</button>
+          </p>
+          <div class="mobileStage"></div>
+
+
+          <br>
+          <br>
+          <p style="color:purple">PC端</p>
+          <p>原图</p>
+          <img id="pic" src="">
+          <br>
+          <p>分割测试</p>
+          <canvas id="canvasTest">您的浏览器不支持Canvas</canvas>
+          <br>
+          <p>临时画布</p>
+          <canvas id="canvas">您的浏览器不支持Canvas</canvas>
+          <br/>
+          <p>舞台</p>
+          <p>
+            <button id="confuse">打乱</button>
+          </p>
+          <div class="stage"></div>
+      </div>
+      <script type="text/javascript">
+
+        ;(function(){
+           var config = {
+              dom:{
+                 fileBtn:document.querySelector('#fileBtn'),
+                 canvasTest:document.querySelector('#canvasTest'),
+                 canvas:document.querySelector("#canvas"),
+                 pic:document.querySelector('#pic'),
+                 stage:document.querySelector(".stage"),
+                 mobilePic:document.querySelector("#mobilePic"),
+                 mobileCanvas:document.querySelector("#mobileCanvas"),
+                 container:document.querySelector(".container"),
+                 mobileStage:document.querySelector(".mobileStage")
+              },
+              stageConfig:{
+                 mark:"dataSort"
+              },
+              gameConfig:{
+                 pieces:4,
+                 initArr:[],
+                 confusedArr:[],
+                 start:null,
+                 drop:null,
+                 realWidth:null,
+                 scale:null,
+                 mobilePicWidth:"10rem"
+              }
+           }
+
+          function game(){
+               var init = function(result){
+                    config.dom.stage.innerHTML="";
+                    config.dom.mobileStage.innerHTML="";
+                    //PC端
+                    //initImage(result);
+
+                    //移动端
+                    initMobileImage(result);
+               }
+
+               function initMobileImage(result){
+
+                  config.dom.mobilePic.setAttribute("src",result);//显示移动端图片
+
+                  config.dom.mobilePic.onload = function(){
+                      console.log("Mobile picture loaded and now start clip");
+
+                        console.log("mobile pic loaded");
+                        var mobilePic = config.dom.mobilePic;
+                        config.gameConfig.realWidth =  config.dom.mobilePic.width;
+
+
+                        //1px对应的rem
+                        var containerWidth = config.dom.container.clientWidth;
+                        var oneP = parseInt(config.gameConfig.mobilePicWidth)/containerWidth;
+
+                        //换算成rem
+                        config.dom.mobilePic.style.width = config.gameConfig.mobilePicWidth;
+                        config.dom.mobilePic.style.height= config.dom.mobilePic.height*oneP+"rem";
+                  
+
+
+                        //算縮放比例
+                        config.gameConfig.scale = (oneP*config.gameConfig.realWidth)/parseInt(config.gameConfig.mobilePicWidth);
+
+                        clipImgWithSetValue();
+                        bindingMobileEvent();
+                        confuseMobile();
+                  }
+               }
+
+
+               function initImage(result){
+                  //设置pc端原图
+                  config.dom.pic.setAttribute("src",result);
+                  
+                  config.dom.pic.onload = function(){
+                      console.log("pic loaded and now start clip");
+                      //pc端处理
+                      clipImgTest();
+                      clipImg();
+                      bindingEvent();
+                      confuse();
+                  }
+               }
+
+               function clipImgTest(){
+                      var canvasTest = config.dom.canvasTest;
+                      var pic = config.dom.pic;
+                      var ctx = canvasTest.getContext("2d");
+                      //console.log(pic.width+"-"+pic.height);
+                      canvasTest.width = pic.width;
+                      canvasTest.height= pic.height;
+                      var formerW = pic.width/config.gameConfig.pieces,
+                          formerH = pic.height/config.gameConfig.pieces,
+                          formerX = 0,
+                          formerY = 0;
+                      for(var i=0;i<config.gameConfig.pieces;i++){
+                          for(var j=0;j<config.gameConfig.pieces;j++){
+                              ctx.drawImage(pic,formerX,formerY,formerW,formerH,formerX,formerY,formerW,formerH);
+                              formerX = formerX+formerW+1;
+                          }
+                          formerX = 0;
+                          formerY += formerH+1;
+                      }
+               }
+
+               function shuffle (arr){
+                   var input = arr;
+                  for (var i = input.length-1; i >=0; i--) {
+                  var randomIndex = Math.floor(Math.random()*(i+1)); 
+                  var itemAtIndex = input[randomIndex]; 
+                  input[randomIndex] = input[i]; 
+                  input[i] = itemAtIndex;
+                  }
+                  return input;
+               }
+
+               function clipImg(){
+                    var canvas = config.dom.canvas;
+                      var pic = config.dom.pic;
+                      var ctx = canvas.getContext("2d");
+
+                      var formerW = pic.width/config.gameConfig.pieces,
+                          formerH = pic.height/config.gameConfig.pieces,
+                          formerX = 0,
+                          formerY = 0;
+                      var count = 0;
+                       config.dom.stage.style.width = pic.width+"px";
+                      config.dom.stage.style.height = pic.height+"px";
+                      for(var i=0;i<config.gameConfig.pieces;i++){
+                          for(var j=0;j<config.gameConfig.pieces;j++){
+                                canvas.width = formerW;
+                                canvas.height= formerH;
+                                ctx.drawImage(pic,formerX,formerY,formerW,formerH,0,0,formerW,formerH);
+                               var image = new Image();
+                               image.setAttribute(config.stageConfig.mark,count++);
+                               image.setAttribute("draggable","true");
+                               image.src = canvas.toDataURL("image/png");
+                               ctx.clearRect(0,0,formerW,formerH);
+                               config.dom.stage.appendChild(image);
+                               formerX = formerX+formerW+1;
+                          }
+                          formerX = 0;
+                          formerY += formerH+1;
+                      }
+                     
+               }
+
+               function clipImgWithSetValue(){
+                       var canvas = config.dom.mobileCanvas;
+                       var pic = config.dom.mobilePic;
+                       var ctx = canvas.getContext("2d");
+                       var scale = config.gameConfig.scale;
+                        var formerW = pic.width/config.gameConfig.pieces,
+                          formerH = pic.height/config.gameConfig.pieces,
+                          formerX = 0,
+                          formerY = 0;
+                      var count = 0;
+                       config.dom.mobileStage.style.width = pic.width+"px";
+                      config.dom.mobileStage.style.height = pic.height+"px";
+
+                      canvas.width = formerW;
+                      canvas.height= formerH;
+
+                      for(var i=0;i<config.gameConfig.pieces;i++){
+                          for(var j=0;j<config.gameConfig.pieces;j++){
+                               ctx.drawImage(pic,formerX,formerY,formerW*scale,formerH*scale,0,0,formerW,formerH);
+                               var image = new Image();
+                               image.setAttribute(config.stageConfig.mark,count++);
+                               image.setAttribute("draggable","true");
+                               image.src = canvas.toDataURL("image/png");
+                               ctx.clearRect(0,0,formerW,formerH);
+                               config.dom.mobileStage.appendChild(image);
+                               formerX = formerX+formerW*scale+1;
+                          }
+                          formerX = 0;
+                          formerY += formerH*scale+1;
+                      }
+               }
+
+               function confuse(){
+                  var imgs = config.dom.stage.querySelectorAll("img");
+
+                  config.gameConfig.initArr = imgs;
+                  var imgList = Array.prototype.slice.call(imgs);
+                  var b = shuffle(imgList);
+                  config.gameConfig.confusedArr = b;
+                  render(config.gameConfig.confusedArr);
+               }
+
+               function confuseMobile(){
+                  var imgs = config.dom.mobileStage.querySelectorAll("img");
+
+                  config.gameConfig.initArr = imgs;
+                  var imgList = Array.prototype.slice.call(imgs);
+                  var b = shuffle(imgList);
+                  config.gameConfig.confusedArr = b;
+                  renderMobile(config.gameConfig.confusedArr);
+               }
+
+               function compare(arr1,arr2){
+                   var mark = true;
+                   if(arr1.length != arr2.length){
+                       mark = false;
+                   }else{
+                       for(var i=0,j=arr1.length;i<j;i++){
+                           if(arr1[i] != arr2[i]){
+                                mark = false;
+                                break;
+                           }
+                       }
+                   }
+                   return mark;
+               }
+
+               function renderMobile(arr){
+                    config.dom.mobileStage.innerHTML="";
+                    for(var i=0;i<arr.length;i++){
+                        config.dom.mobileStage.appendChild(arr[i]);
+                    }
+               }
+               function render(arr){
+                    config.dom.stage.innerHTML="";
+                    for(var i=0;i<arr.length;i++){
+                        config.dom.stage.appendChild(arr[i]);
+                    }
+               }
+
+               function handleMove(arr,start,drop){
+                    var startIndex=null;
+                    var dropIndex = null;
+                    for(var i=0,j=arr.length;i<j;i++){
+                         if(arr[i] == start){
+                           startIndex = i;
+                         }else if(arr[i] == drop){
+                           dropIndex = i;
+                         }
+                    }
+                    if(startIndex != null && dropIndex != null){
+                          arr[startIndex] = drop;
+                          arr[dropIndex]  = start;
+                    }
+                    return arr;
+               }
+
+               function bindingEvent(){
+                    var imgs = config.dom.stage.querySelectorAll("img");
+                    for(var i=0;i<imgs.length;i++){
+                         var that = imgs[i];
+                         that.addEventListener("dragstart",function(event){
+                            config.gameConfig.start = event.target;
+                         });
+
+                         that.addEventListener("dragend",function(event){
+                               var start = config.gameConfig.start;
+                               var drop = config.gameConfig.drop;
+                               if(start != null && drop != null){
+                                  if(start !== drop){
+                                   config.gameConfig.confusedArr=handleMove(config.gameConfig.confusedArr,start,drop);
+                                    render( config.gameConfig.confusedArr);
+
+                                    if(compare(config.gameConfig.confusedArr,config.gameConfig.initArr)){
+                                         alert("完成拼图 - -！");
+                                    }
+                                  }
+                               }
+                         });
+
+                         that.addEventListener("dragover",function(event){
+                               event.preventDefault();
+                         });
+
+                         that.addEventListener("drop",function(event){
+                              config.gameConfig.drop= event.target;
+                         })
+                    }
+               }
+
+               function bindingMobileEvent(){
+                    var mobileStage = config.dom.mobileStage;
+                    mobileStage.addEventListener("touchstart",function(event){
+                         event.preventDefault();
+                         config.gameConfig.start = event.target;
+                    });
+                    mobileStage.addEventListener("touchend",function(event){
+                         event.preventDefault();
+                         var start = config.gameConfig.start;
+                         var drop = document.elementFromPoint(event.changedTouches[0].pageX,event.changedTouches[0].pageY);
+                          if(start != null && drop != null){
+                                  if(start !== drop){
+                                   config.gameConfig.confusedArr=handleMove(config.gameConfig.confusedArr,start,drop);
+                                    renderMobile( config.gameConfig.confusedArr);
+
+                                    if(compare(config.gameConfig.confusedArr,config.gameConfig.initArr)){
+                                         alert("完成拼图 - -！");
+                                    }
+                                  }
+                               }
+                    });
+               }
+
+               return {
+                  init:init,
+                  confuse:confuse,
+                  confuseMobile:confuseMobile
+               }
+           }
+           var game = new game();
+
+           //listen changes
+           config.dom.fileBtn.addEventListener("change",function(event){
+               var files = this.files;
+                if(files.length > 0){
+                    var file = files[0];
+
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(){
+                       game.init(this.result);
+                    }
+                    fileReader.onerror = function(){
+                       console.log("failed");
+                    }
+
+                    fileReader.readAsDataURL(file);
+                 }
+           });
+
+           document.querySelector("#confuse").addEventListener("click",function(){
+                  game.confuse();
+           });
+           
+          document.querySelector("#confuseMobile").addEventListener("click",function(){
+                  game.confuseMobile();
+           });
+
+        })();
+
+
+         
+
+      </script>
+</body>
+</html>
