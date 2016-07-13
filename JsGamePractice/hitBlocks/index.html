@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="apple-touch-fullscreen">
+    <meta content="telephone=no,email=no" name="format-detection">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+    <title>game3 hitblocks</title>
+     <style type="text/css">
+        html,body{
+          width:100%;
+          height: 100%;
+        }
+        *{
+          padding:0;
+          margin:0;
+        }
+        .container{
+           width:100%;
+           height: 100%;
+           overflow:hidden;
+           background:-webkit-linear-gradient(top,gray,white);
+           position: relative;
+        }
+
+        .bottomBlock{
+          position: absolute;
+          bottom: 0;
+          left:0;
+        }
+
+        .scoreBar{
+          width:10rem;
+          height: 0.9rem;
+          background-color:olive;
+          color:white;
+          font-size: 0.7rem;
+        }
+
+        .toplock{
+          position: absolute;
+          top: 0;
+          left:0;
+        }
+
+       .hitBlocks{
+          list-style: none;
+
+          width:10rem;
+       }
+       .hitBlocks li{
+          width:2.5rem;
+          height: 0.9rem;
+          float: left;
+          background-color: #66CCFF;
+          -webkit-box-shadow: 0 0 0.3rem 0 pink inset;
+       }
+
+       .blockAct{
+         width:2.5rem;
+          height: 0.9rem;
+          float: left;
+          background-color: #66CCFF;
+          -webkit-box-shadow: 0 0 0.3rem 0 pink inset;
+       }
+ 
+       .moveBlocks{
+              list-style: none;
+              width:10rem;
+        }
+       .moveBlocks li{
+          width:2.5rem;
+          height: 0.9rem;
+          float: left;
+          background-color: #66CCFF;
+          -webkit-box-shadow: 0 0 0.3rem 0 lightgreen inset;
+       }
+      .moveBlocks .chosen{
+         background-color:inherit;
+         -webkit-box-shadow:none;
+      }
+     </style>
+     <script async>
+            var calculate_size = function() {
+                var docEl = document.documentElement,
+                    clientWidth = document.querySelector(".container").clientWidth;
+                if (!clientWidth) return;
+                docEl.style.fontSize = (clientWidth / 10) + 'px';
+            };
+            if (document.addEventListener) {
+                var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
+                window.addEventListener(resizeEvt, calculate_size, false);
+                document.addEventListener('DOMContentLoaded', calculate_size, false);
+                calculate_size();
+            }
+    </script>
+</head>
+<body>
+     <div class="container">
+        <div class="scoreBar">
+            score:<span id="score">0</span>分
+        </div>
+        <div class="topBlock"></div>
+
+
+        <div class="bottomBlock"></div>
+     </div>
+
+     <script type="text/javascript">
+       window.onload = function(){
+
+           var config = {
+               scoreBar:document.querySelector(".scoreBar"),
+               bottomDom:document.querySelector(".bottomBlock"),
+               topDom:document.querySelector(".topBlock"),
+               screenHeight:document.querySelector(".container").clientHeight,
+               liHeight:0,
+               TopHeight:0,
+               scoreBarHeight:0,
+               chosenClass:"chosen",
+               score:document.querySelector("#score"),
+               interval:null
+           }
+
+           function game(){
+              function init(){
+                  //底部
+                  clearStage();
+                  render("bottom");
+                  render("bottom");
+                  render("top");
+                  render("top");
+                  render("top");
+                  render("top");
+                  render("top");
+                  bindBottomEvent();
+                  render("scoreBar");
+              }
+              function render(flag){
+                   if(flag=="top"){
+                     insertElem(config.topDom,createTop());
+                      if(config.liHeight === 0){
+                          config.TopHeight=config.liHeight =parseFloat(document.defaultView.getComputedStyle(config.topDom.querySelector("ul li")).height);
+                      }else{
+                           config.TopHeight +=config.liHeight;
+                           if((config.TopHeight + (config.liHeight)*2) >= config.screenHeight){
+                               gameOver();
+                           }
+                      }
+                   }else if(flag=="bottom"){
+                     insertElem(config.bottomDom,createBottom());
+                   }else if(flag=="scoreBar"){
+                      if(config.scoreBarHeight === 0){
+                         score.innerHTML = 0;
+                         config.scoreBarHeight =parseFloat(document.defaultView.getComputedStyle(config.scoreBar).height);
+                      }
+                   }
+              }
+              function clearStage(){
+                  document.querySelector(".bottomBlock").innerHTML = "";
+                  document.querySelector(".topBlock").innerHTML = "";
+                  document.querySelector("#score").innerHTML = 0;
+                  config.liHeight = 0;
+                  config.TopHeight =0;
+                  config.scoreBarHeight = 0;
+              }
+
+              function bottomEventHandler(event){
+                var that = event;
+                console.log(that.target);
+                var temp = that.target;
+                        var left = temp.offsetLeft;
+                        var top  = temp.offsetTop;
+                        var div = document.createElement("div");
+                         div.className = "blockAct";
+                         div.style.cssText = "position:absolute;left:"+left+"px;";
+                         div.style.bottom  = "0px";
+                         document.querySelector(".container").appendChild(div);
+                         var interval = setInterval(function(){
+                            div.style.bottom = parseInt(div.style.bottom)+2+"px";
+                            if((parseFloat(div.style.bottom)+config.liHeight)>=(config.screenHeight - config.TopHeight)-config.scoreBarHeight){
+                                 var hitEle = document.elementFromPoint(parseFloat(div.style.left),config.TopHeight+config.scoreBarHeight-5);
+                                 console.log(hitEle.className);
+
+                                 if(hitEle.className === config.chosenClass){
+                                      hitEle.parentNode.remove();
+                                      config.TopHeight -= config.liHeight;
+                                      calcScore(10);
+                                 }else{
+                                      render("top");
+                                      // bindBottomEvent();
+                                      calcScore(-10);
+                                 }
+                                 div.remove();
+                                 clearInterval(interval);
+                            }
+
+                         },1000/60);
+              }
+
+              function calcScore(num){
+
+                 var score = parseInt(config.score.innerText);
+                 if((score+num)<0){
+                    gameOver();
+
+                 }else{
+                    config.score.innerText=score+num;
+                 }
+              }
+
+              function gameOver(){
+                  
+                  clearInterval(config.interval);
+                  config.interval = null;
+
+                  var temp = confirm("You got "+config.score.innerHTML+" Game Over! Click to restart?");
+                  if(temp ==true){
+                     init();
+                  }else{
+                     alert("....OK you chose not to paly again");
+                  }
+                  //init();
+              }
+
+              function bindBottomEvent(){
+                removeBottomEvent();
+                 addBottomEvent();
+              }
+
+              function addBottomEvent(){
+                  var bottomDom = config.bottomDom.querySelectorAll("ul");
+                  for(var i=0;i<bottomDom.length;i++){
+                      var that = bottomDom[i];
+                      that.addEventListener("click",bottomEventHandler,false);
+
+                  }
+              }
+
+              function removeBottomEvent(){
+                  var bottomDom = config.bottomDom.querySelectorAll("ul");
+                  for(var i=0;i<bottomDom.length;i++){
+                      var that = bottomDom[i];
+                      that.removeEventListener("click",bottomEventHandler,false);
+
+                  }
+              }
+
+              function createBottom(){
+                  var ul = document.createElement("ul");
+                  ul.setAttribute("class","hitBlocks");
+                  for(var i=0;i<4;i++){
+                       var li = document.createElement("li");
+                      ul.appendChild(li);
+                  }
+                  return ul;
+              }
+
+              function createTop(){
+                  var ul = document.createElement("ul");
+                  ul.setAttribute("class","moveBlocks");
+                  var randomNum = getRandom(0,4);
+                  for(var i=0;i<4;i++){
+                       var li = document.createElement("li");
+                      if(i===randomNum){
+                          li.className = "chosen";
+                      }
+                      ul.appendChild(li);
+                  }
+
+                  return ul;
+              }
+
+              function insertElem(parent,ele){
+                  parent.insertBefore(ele,parent.firstChild);
+              }
+
+              function getRandom(n,m){
+                 var num = parseInt((Math.random()*(n-m)+m));
+                 return num;
+              }
+              function start(){
+                 config.interval= setInterval(function(){
+                     insertElem(config.topDom,createTop());
+                      if(config.liHeight === 0){
+                          config.TopHeight=config.liHeight =parseFloat(document.defaultView.getComputedStyle(config.topDom.querySelector("ul li")).height);
+                      }else{
+                           config.TopHeight +=config.liHeight;
+                           if((config.TopHeight + (config.liHeight)*2 +config.scoreBarHeight) >= config.screenHeight){
+                               gameOver();
+                           }
+                      }
+                  },1000);
+
+              }
+              return {
+                 init:init,
+                 render:render,
+                 start:start
+              }
+           }
+           var g = new game();
+           g.init(); 
+           g.start();
+
+       }
+
+     </script>
+</body>
+</html>
