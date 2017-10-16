@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://mydnvglcdn.azureedge.net/cdn/dnvgl-styles/common/js/jquery/2.2.2/jquery.min.js"></script>
+    <style>
+      .yellow{
+          fill:yellow;
+      }
+      .icon-color-primary{
+          fill:#0F204B;
+      }
+
+
+    </style>
+</head>
+<body>
+    <div class="common-svg" data-svg="i-support" data-svgClass="svg-support"></div>
+    <div class="common-svg" data-svg="i-alert" data-svgClass="svg-support"></div>
+    <div class="common-svg" data-svg="i-services" data-svgClass="svg-support"></div> 
+    <div class="common-svg" data-svg="i-profile" data-svgClass="svg-support"></div>
+    <div class="common-svg" data-svg="i-veracity-data-platform" data-svgClass="svg-support"></div>
+
+
+    
+    <script>
+        (function($){
+           $(".common-svg").each(function(){
+              var that = $(this);
+              var cdnUrl = "https://mydnvglcdn.azureedge.net/cdn/veracity/icons/";
+              var icon = that.data("svg");
+              var className = that.data("svgclass");
+              $.get(cdnUrl+icon+".svg",function(data){
+                  var svg = $($(data).find("svg")[0]);
+                  if(!!className){
+                    svg.attr("class",className);
+                  }
+                  that.html(svg);
+              });
+           });
+        })($);
+        
+
+
+   </script>
+</body>
+</html>
